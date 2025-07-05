@@ -10,6 +10,7 @@ uniform vec4 outlineColor;       // The RGBA of the outline color specified in s
 uniform float outlineThickness;  // The thickness of the outline in pixels specified in settings.
 uniform vec4 secondOutlineColor; // The RGBA of the second outline color specified in settings.
 uniform float secondOutlineThickness;  // The thickness of the second outline in pixels specified in settings.
+uniform float time;
 
 vec2 tex_to_pixel(vec2 texcoord) {
     return vec2(texcoord0.x * windowExpandedSize.x - windowTopLeft.x,
@@ -22,6 +23,12 @@ vec2 pixel_to_tex(vec2 pixelcoord) {
 bool hasExpandedSize() { return windowSize != windowExpandedSize; }
 bool hasPrimaryOutline() { return outlineColor.a > 0.0 && outlineThickness > 0.0; }
 bool hasSecondOutline() { return hasExpandedSize() && secondOutlineColor.a > 0.0 && secondOutlineThickness > 0.0; }
+
+vec3 hsv2rgb(vec3 c) {
+    vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+    vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
+    return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
+}
 
 #include "shapecorners_shadows.glsl"
 
@@ -51,8 +58,11 @@ vec4 shapeCorner(vec2 coord0, vec4 tex, vec2 start, float angle, vec4 coord_shad
     float distance_from_center = distance(coord0, roundness_center);
 
     vec4 secondaryOutlineOverlay = mix(coord_shadowColor, secondOutlineColor, secondOutlineColor.a);
+
     if (tex.a > 0.0 && hasPrimaryOutline()) {
-        vec4 outlineOverlay = vec4(mix(tex.rgb, outlineColor.rgb, outlineColor.a), 1.0);
+        float angle = atan(coord0.y - windowSize.y / 2.0, coord0.x - windowSize.x / 2.0) / 6.28318530718;
+        vec3 color = hsv2rgb(vec3(angle + time / 10000.0, 0.6, 1.0));
+        vec4 outlineOverlay = vec4(mix(tex.rgb, color, outlineColor.a), 1.0);
 
         if (outlineThickness > radius && is_within(coord0, outlineStart, start) && !is_within(coord0, roundness_center, start)) {
             // when the outline is bigger than the roundness radius

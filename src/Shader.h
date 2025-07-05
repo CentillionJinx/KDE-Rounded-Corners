@@ -8,6 +8,7 @@
 #include <QRectF> // for KWin 5.27 compatibility
 #include <QVector2D>
 #include <memory>
+#include <chrono>
 
 namespace KWin {
     class GLShader;
@@ -49,7 +50,7 @@ namespace ShapeCorners {
          * \param window The window that the effect will be rendering on
          * \param scale The scale of the screen
          */
-        void Bind(const ShapeCorners::Window &window, qreal scale) const;
+        void Bind(const ShapeCorners::Window &window, qreal scale, std::chrono::milliseconds time) const;
 
         /**
          * \brief Pop the shader from the stack of rendering.
@@ -146,6 +147,7 @@ namespace ShapeCorners {
          *        Containing the active texture. When assigned to zero, it will contain the painted contents of the window.
          */
         int m_shader_front = 0;
+        int m_shader_time = 0;
     };
 }
 

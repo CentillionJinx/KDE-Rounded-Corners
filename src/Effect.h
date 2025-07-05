@@ -29,6 +29,8 @@
     #include <kwinoffscreeneffect.h>
 #endif
 
+class QDBusMessage;
+
 namespace ShapeCorners {
     using MenuBarList = std::vector<KWin::EffectWindow*>;
 
@@ -70,6 +72,7 @@ namespace ShapeCorners {
         WindowList m_managed;
         MenuBarList m_menuBars;
         Shader m_shaderManager;
+        std::chrono::milliseconds m_time{};
 
         void checkTiled();
         [[nodiscard]] QRegion getRegionWithoutMenus(const QRect& screen_geometry);

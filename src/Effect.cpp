@@ -74,7 +74,7 @@ ShapeCorners::Effect::windowAdded(KWin::EffectWindow *w)
     if (w->isDock()) {
 #ifdef QT_DEBUG
     qInfo() << "ShapeCorners: menu added." << w;
-#endif  
+#endif
         m_menuBars.push_back(w);
         return;
     }
@@ -82,7 +82,7 @@ ShapeCorners::Effect::windowAdded(KWin::EffectWindow *w)
 #ifdef QT_DEBUG
     qInfo() << "ShapeCorners: window added." << w;
 #endif
-    
+
     if (w->windowClass().trimmed().isEmpty() && w->caption().trimmed().isEmpty()) {
 #ifdef QT_DEBUG
         qWarning() << "ShapeCorners: window does not have a valid class name.";
@@ -166,6 +166,7 @@ void ShapeCorners::Effect::prePaintWindow(KWin::EffectWindow *w, KWin::WindowPre
         return;
     }
 
+    m_time = time;
     window_iterator->second->animateProperties(time);
 
     if(window_iterator->second->hasRoundCorners()) {
@@ -188,6 +189,9 @@ void ShapeCorners::Effect::prePaintWindow(KWin::EffectWindow *w, KWin::WindowPre
     }
 
     OffscreenEffect::prePaintWindow(w, data, time);
+
+    // Force continuous repainting for animation
+    w->addRepaintFull();
 }
 
 bool ShapeCorners::Effect::supported()
@@ -225,7 +229,7 @@ void ShapeCorners::Effect::drawWindow(KWin::EffectWindow *w, int mask, const QRe
 
     redirect(w);
     setShader(w, m_shaderManager.GetShader().get());
-    m_shaderManager.Bind(*window_iterator->second, scale);
+    m_shaderManager.Bind(*window_iterator->second, scale, m_time);
     glActiveTexture(GL_TEXTURE0);
 
 #if QT_VERSION_MAJOR >= 6
@@ -282,7 +286,7 @@ QRegion ShapeCorners::Effect::getRegionWithoutMenus(const QRect& screen_geometry
 #endif
 
     return screen_region;
-} 
+}
 
 void ShapeCorners::Effect::checkMaximized(KWin::EffectWindow *w) {
     auto window_iterator = m_managed.find(w);

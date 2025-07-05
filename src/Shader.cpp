@@ -40,6 +40,7 @@ ShapeCorners::Shader::Shader():
     m_shader_secondOutlineColor = m_shader->uniformLocation("secondOutlineColor");
     m_shader_secondOutlineThickness = m_shader->uniformLocation("secondOutlineThickness");
     m_shader_front = m_shader->uniformLocation("front");
+    m_shader_time = m_shader->uniformLocation("time");
     qInfo() << "ShapeCorners: shaders loaded.";
 }
 
@@ -47,7 +48,7 @@ bool ShapeCorners::Shader::IsValid() const {
     return m_shader && m_shader->isValid();
 }
 
-void ShapeCorners::Shader::Bind(const Window &window, const qreal scale) const {
+void ShapeCorners::Shader::Bind(const Window &window, const qreal scale, const std::chrono::milliseconds time) const {
     const auto frameGeometry = window.w.frameGeometry() * scale;
     const auto expandedGeometry = window.w.expandedGeometry() * scale;
     const auto xy = QVector2D(frameGeometry.topLeft() - expandedGeometry.topLeft());
@@ -67,6 +68,7 @@ void ShapeCorners::Shader::Bind(const Window &window, const qreal scale) const {
     m_shader->setUniform(m_shader_outlineColor, window.outlineColor.toQColor());
     m_shader->setUniform(m_shader_secondOutlineColor, window.secondOutlineColor.toQColor());
     m_shader->setUniform(m_shader_shadowColor, window.shadowColor.toQColor());
+    m_shader->setUniform(m_shader_time, static_cast<float>(time.count()));
 }
 
 void ShapeCorners::Shader::Unbind() const {
