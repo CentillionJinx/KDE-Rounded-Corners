@@ -61,7 +61,8 @@ vec4 shapeCorner(vec2 coord0, vec4 tex, vec2 start, float angle, vec4 coord_shad
 
     if (tex.a > 0.0 && hasPrimaryOutline()) {
         float angle = atan(coord0.y - windowSize.y / 2.0, coord0.x - windowSize.x / 2.0) / 6.28318530718;
-        vec3 color = hsv2rgb(vec3(angle + time / 10000.0, 0.6, 1.0));
+        // The below variable controls the speed
+        vec3 color = hsv2rgb(vec3(angle + time / 3333.0, 0.6, 1.0));
         vec4 outlineOverlay = vec4(mix(tex.rgb, color, outlineColor.a), 1.0);
 
         if (outlineThickness > radius && is_within(coord0, outlineStart, start) && !is_within(coord0, roundness_center, start)) {
